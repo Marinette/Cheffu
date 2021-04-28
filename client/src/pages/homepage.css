@@ -1,0 +1,9 @@
+.homepage-content .search {
+    min-height: 25vh;
+
+    margin-bottom: 5%; 
+}
+
+.homepage-content .results {
+    min-height: 25vh;
+}

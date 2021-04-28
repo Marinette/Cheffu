@@ -1,0 +1,291 @@
+openapi: 3.0.0
+info:
+  title: Teambits server specification
+  description: Server specification and path templating
+  version: 1.0.0
+servers:
+  - url: 'https://teambits_ece444_a1.com/v1/'
+    description: 'General use server'
+paths:
+  /:
+    get:
+      summary: Home page
+      operationId: home
+      responses:
+        '200':
+          description: The default homepage
+        default:
+          description: Unknown Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /search:
+    get:
+      summary: Base search page
+      operationId: getSearchPage
+      responses:
+        '200':
+          description: Base search page
+        default:
+          description: Unknown Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Create or update list of ingredients
+      operationId: setIngredients
+      tags:
+        - recipe, ingredient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ingredients'
+      responses:
+        '200':
+          description: List of recipes that match ingredient list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipes'
+        '204':
+          description: Ingredient list received but no recipes match
+        '400':
+          description: Invalid ingredient list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientError'
+        default:
+          description: Unknown Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /recipe/{recipeID}:
+    get:
+      tags:
+        - 'recipe'
+      summary: Recipe details for recipeID
+      operationId: getRecipeByID
+      parameters:
+        - name: recipeID
+          in: path
+          description: The ID of the recipe to display
+          required: true
+          schema:
+            $ref: '#/components/schemas/RecipeID'
+      responses:
+        '200':
+          description: Successful fetch of recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedRecipe'
+        '400':
+          description: Invalid recipeID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeError'
+        default:
+          description: Unknown Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Ingredient:
+      type: object
+      required:
+        - ingredientID
+        - ingredientName
+      properties:
+        ingredientID:
+          type: integer
+          format: int64
+        ingredientName:
+          type: string
+        ingredientTags:
+          type: array
+          items:
+            type: string
+        ingredientQuantity:
+          type: float
+          format: float64
+        ingredientQuantityUnits:
+          type: string
+      example:
+        ingredientID: 4
+        ingredientName: Chicken
+        ingredientTags: [ 'meat', 'dairy-free' ]
+        ingredientQuantity: 20.0
+        ingredientQuantityUnits: 'kg'
+    Ingredients:
+      type: array
+      items:
+        $ref: '#/components/schemas/Ingredient'
+      example:
+        - ingredientID: 4
+          ingredientName: Chicken
+          ingredientTags: [ 'meat', 'dairy-free' ]
+          ingredientQuantity: 20.0
+          ingredientQuantityUnits: 'kg'
+        - ingredientID: 325
+          ingredientName: Ghost Pepper
+          ingredientTags: [ 'spicy', 'vegan', 'vegetarian', 'dairy-free', 'gluten-free' ]
+          ingredientQuantity: 12.3
+          ingredientQuantityUnits: 'serving'
+    Recipe:
+      type: object
+      required:
+        - recipeID
+        - recipeName
+        - recipeURL
+      properties:
+        recipeID:
+          type: integer
+          format: int64
+        recipeName:
+          type: string
+        recipeImageURL:
+          type: array
+          items:
+            type: string
+        recipeURL:
+          type: string
+        recipeDescription:
+          type: string
+        recipeRating:
+          type: float32
+        recipeTags:
+          type: array
+          items:
+            type: string
+      example:
+        recipeID: 13
+        recipeName: 'Carrot a la Potato'
+        recipeImageURL: ['https://picture/of/carrot_potato.jpg', 'https://picture/of/potato_carrot.jpg']
+        recipeURL: 'https://another/site/with/carrot_potato'
+        recipeDescription: 'This is the traditional dish of carrot potatoes. Not to be confused with potato carrots.'
+        recipeRating: 0.4
+        recipeTags: ['vegan', 'vegetarian', 'gluten-free', 'low-carb']
+    Recipes:
+      type: array
+      items:
+        $ref: '#/components/schemas/Recipe'
+      example:
+        - recipeID: 13
+          recipeName: 'Carrot a la Potato'
+          recipeImageURL: [ 'https://picture/of/carrot_potato.jpg', 'https://picture/of/potato_carrot.jpg' ]
+          recipeURL: 'https://another/site/with/carrot_potato'
+          recipeDescription: 'This is the traditional dish of carrot potatoes. Not to be confused with potato carrots.'
+          recipeRating: 0.4
+          recipeTags: [ 'vegan', 'vegetarian', 'gluten-free', 'low-carb' ]
+        - recipeID: 66
+          recipeName: 'Chicken chicken'
+          recipeImageURL: [ 'https://picture/of/chicken.jpg', 'https://picture/of/chicken_chicken.jpg' ]
+          recipeURL: 'https://all_about_chicken/chicken/chicken'
+          recipeDescription: 'Chicken is the only chicken that tastes like chicken.'
+          recipeRating: 3.7
+          recipeTags: [ 'meat', 'spicy' ]
+    DetailedRecipe:
+      allOf:
+        - $ref: '#/components/schemas/Recipe'
+        - type: object
+          required:
+            - recipeIngredientList
+            - recipeCookingInstructions
+            - recipePreparationTime
+            - recipeCookingTime
+          properties:
+            recipeIngredientList:
+              $ref: '#/components/schemas/Ingredients'
+            recipeCookingInstructions:
+              type: array
+              items:
+                type: string
+            recipePreparationTime:
+              type: float
+              format: float32
+              description: Preparation time in minutes
+            recipeCookingTime:
+              type: float
+              format: float32
+              description: Cooking time in minutes
+          example:
+            recipeID: 66
+            recipeName: 'Chicken chicken'
+            recipeImageURL: [ 'https://picture/of/chicken.jpg', 'https://picture/of/chicken_chicken.jpg' ]
+            recipeURL: 'https://all_about_chicken/chicken/chicken'
+            recipeDescription: 'Chicken is the only chicken that tastes like chicken.'
+            recipeRating: 3.7
+            recipeTags: [ 'meat', 'spicy' ]
+            recipeIngredientList:
+              - ingredientID: 4
+                ingredientName: Chicken
+                ingredientTags: [ 'meat', 'dairy-free' ]
+                ingredientQuantity: 20.0
+                ingredientQuantityUnits: 'kg'
+              - ingredientID: 892
+                ingredientName: Chicken Broth
+                ingredientTags: [ 'pre-cooked', 'salty' ]
+                ingredientQuantity: 3.5
+                ingredientQuantityUnits: 'L'
+              - ingredientID: 2731
+                ingredientName: Chicken Powder
+                ingredientTags: [ 'meat', 'salty', 'MSG' ]
+                ingredientQuantity: 85.0
+                ingredientQuantityUnits: 'tablespoon'
+              - ingredientID: 325
+                ingredientName: Ghost Pepper
+                ingredientTags: [ 'spicy', 'vegan', 'vegetarian', 'dairy-free', 'gluten-free' ]
+                ingredientQuantity: 12.3
+                ingredientQuantityUnits: 'serving'
+            recipeCookingInstructions: [
+                'First, find a chicken' ,
+                'Marinate the chicken in 500mL of chicken broth',
+                'Sprinkle 20g of chicken powder on the chicken',
+                'Place 10 ghost peppers inside the chicken',
+                'Cook at 450 degrees Fahrenheit for 3 hours',
+                'Let it cool for 20 minutes',
+                'Serve on a large plate'
+            ]
+            recipePreparationTime: 40
+            recipeCookingTime: 200
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    IngredientError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          required:
+            - ingredientNameList
+          properties:
+            ingredientNameList:
+              type: array
+              items:
+                type: string
+              description: List of ingredient names that caused the error
+    RecipeError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          required:
+            - recipeID
+          properties:
+            recipeID:
+              $ref: '#/components/schemas/RecipeID'

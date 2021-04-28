@@ -1,0 +1,38 @@
+.search-bar input {
+  height: var(--height);
+  font-family: var(--font-fam);
+  border: 0.5;
+  color: var(--color-dark);
+  font-size: 1.8rem;
+  width: 25%;
+  background: var(--color-light);
+  padding: 0 1.6rem;
+  border-radius: var(--rad);
+  appearance: none;
+  transition: all var(--dur) var(--bez);
+  transition-property: width, border-radius;
+  z-index: 1;
+  position: relative;
+}
+
+.search-bar {
+  left: 50%;
+  top: 50%;
+}
+
+.search-bar-header {
+    margin-bottom: 5%;
+    text-align: center;
+}
+
+.search-bar-header h1 {
+    text-align: center;
+}
+
+.search-bar-header p {
+    text-align: center;
+}
+
+.logo{
+  width: 70vw;
+}

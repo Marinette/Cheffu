@@ -1,0 +1,16 @@
+.results-panel {
+    justify-content: center;
+}
+.recipe-results{
+    justify-content: center;
+}
+
+.recipe-results h1 {
+    text-align: center;
+
+    margin-bottom: 5%;
+}
+
+.search-results-grid {
+    justify-content: center;
+}

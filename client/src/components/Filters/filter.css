@@ -1,0 +1,23 @@
+.filter-header {
+    margin-bottom: 5%;
+}
+
+.filter-header h1 {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.filter-header p {
+    text-align: center;
+}
+
+.filter-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-form-item {
+    height: auto;
+}
